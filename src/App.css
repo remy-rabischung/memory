@@ -1,3 +1,8 @@
+.App {
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
 .card-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -9,13 +14,13 @@
 
 .card {
   width: 100%;
-  height: 0;
   padding-bottom: 100%;
   position: relative;
   border-radius: 10px;
   overflow: hidden;
   transform-style: preserve-3d;
   transition: transform 0.5s ease;
+  cursor: pointer;
 }
 
 .card.flip {
@@ -40,8 +45,13 @@
   backface-visibility: hidden;
 }
 
-.card-front {
+.card-back {
   transform: rotateY(180deg);
+}
+.card-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .card img {
