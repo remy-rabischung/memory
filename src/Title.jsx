@@ -1,7 +1,7 @@
 import React from "react";
 
 const Title = () => {
-  return <h1 className="title">World Wonders Match</h1>;
+  return <img src="src/assets/images/logo.png" className="title"></img>;
 };
 
 export default Title;

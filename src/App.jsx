@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Card from "./Card";
 import Button from "./Button";
 import Title from "./Title";
-//import backImage from "./assets/images/back.png";
 import coliseeImage from "./assets/images/colisee.png";
 import machuImage from "./assets/images/machu.png";
 import chineImage from "./assets/images/chine.png";
@@ -28,8 +27,10 @@ const initialCards = images.concat(images).map((image, index) => ({
 }));
 
 function App() {
-  const [cards, setCards] = useState([]);
-  const [flippedIndexes, setFlippedIndexes] = useState([]);
+    const [cards, setCards] = useState([]);
+    const [flippedIndexes, setFlippedIndexes] = useState([]);
+    const [musicPlaying, setMusicPlaying] = useState(false);
+    const audioRef = useRef(null); // crée une référence à l'élément audio
 
   useEffect(() => {
     shuffleCards(initialCards);
@@ -80,6 +81,20 @@ function App() {
     setFlippedIndexes([]);
   };
 
+  const toggleMusic = () => {
+    const audioElement = document.getElementById("backgroundMusic");
+    if (audioElement.paused) {
+      setTimeout(() => {
+        audioElement.play().catch(error => {
+          console.error('Error playing audio:', error);
+        });
+      }, 100); // ajoute un délai de 100 ms avant de démarrer la musique
+    } else {
+      audioElement.pause();
+    }
+    setMusicPlaying(!musicPlaying);
+  }
+
   return (
     <div className="App">
       <Title />
@@ -94,6 +109,13 @@ function App() {
         ))}
       </div>
       <Button onClick={restartGame}>Restart Game</Button>
+      <Button onClick={toggleMusic}>
+        {musicPlaying ? "Pause Music" : "Play Music"}
+      </Button>
+      <audio ref={audioRef} id="backgroundMusic" loop>
+        <source src="./assets/musique/Red.m4a" type="audio/mpeg" />
+        Votre navigateur ne prend pas en charge l'élément audio.
+      </audio>
     </div>
   );
 }
