@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Card from "./Card";
 import Button from "./Button";
 import Title from "./Title";
-import backImage from "./assets/images/back.png";
+//import backImage from "./assets/images/back.png";
 import coliseeImage from "./assets/images/colisee.png";
 import machuImage from "./assets/images/machu.png";
 import chineImage from "./assets/images/chine.png";
