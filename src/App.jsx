@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import Card from "./Card";
 import Button from "./Button";
 import Title from "./Title";
+import "./App.css";
+
 import coliseeImage from "./assets/images/colisee.png";
 import machuImage from "./assets/images/machu.png";
 import chineImage from "./assets/images/chine.png";
 import chichenImage from "./assets/images/chichen.png";
 import tajImage from "./assets/images/taj.png";
 import petraImage from "./assets/images/petra.png";
-import "./App.css";
 
 const images = [
   coliseeImage,
@@ -19,22 +20,62 @@ const images = [
   petraImage,
 ];
 
-const initialCards = images.concat(images).map((image, index) => ({
-  image: image,
-  isFlipped: false,
-  isMatched: false,
-  id: index,
-}));
+const initialCards = images
+  .concat(images)
+  .map((image, index) => ({
+    image: image,
+    isFlipped: false,
+    isMatched: false,
+    id: index,
+  }));
 
-function App() {
+  function App() {
     const [cards, setCards] = useState([]);
     const [flippedIndexes, setFlippedIndexes] = useState([]);
     const [musicPlaying, setMusicPlaying] = useState(false);
-    const audioRef = useRef(null); // crée une référence à l'élément audio
+    const [isGameWon, setIsGameWon] = useState(false);
+  
+    useEffect(() => {
+      shuffleCards(initialCards);
+    }, []);
+  
+    useEffect(() => {
+      const allCardsMatched = cards.every((card) => card.isMatched);
+      if (allCardsMatched) {
+        setIsGameWon(true);
+      }
+    }, [cards]);
+  
+    useEffect(() => {
+      return () => {
+        setCards([]);
+        setFlippedIndexes([]);
+        setIsGameWon(false);
+      };
+    }, []);
 
   useEffect(() => {
-    shuffleCards(initialCards);
-  }, []);
+    if (flippedIndexes.length === 2) {
+      const [index1, index2] = flippedIndexes;
+      if (cards[index1].image === cards[index2].image) {
+        setCards((prevCards) =>
+          prevCards.map((card, i) =>
+            i === index1 || i === index2 ? { ...card, isMatched: true } : card
+          )
+        );
+        setFlippedIndexes([]);
+      } else {
+        setTimeout(() => {
+          setCards((prevCards) =>
+            prevCards.map((card, i) =>
+              i === index1 || i === index2 ? { ...card, isFlipped: false } : card
+            )
+          );
+          setFlippedIndexes([]);
+        }, 1000);
+      }
+    }
+  }, [flippedIndexes, cards]);
 
   const shuffleCards = (cardsArray) => {
     for (let i = cardsArray.length - 1; i > 0; i--) {
@@ -54,50 +95,35 @@ function App() {
     setFlippedIndexes((prevIndexes) => [...prevIndexes, index]);
   };
 
-  useEffect(() => {
-    if (flippedIndexes.length === 2) {
-      const [index1, index2] = flippedIndexes;
-      if (cards[index1].image === cards[index2].image) {
-        setCards((prevCards) =>
-          prevCards.map((card, i) =>
-            i === index1 || i === index2 ? { ...card, isMatched: true } : card
-          )
-        );
-      } else {
-        setTimeout(() => {
-          setCards((prevCards) =>
-            prevCards.map((card, i) =>
-              i === index1 || i === index2 ? { ...card, isFlipped: false } : card
-            )
-          );
-        }, 1000);
-      }
-      setFlippedIndexes([]);
-    }
-  }, [flippedIndexes, cards]);
-
   const restartGame = () => {
     shuffleCards(initialCards);
     setFlippedIndexes([]);
+    setIsGameWon(false);
   };
 
   const toggleMusic = () => {
-    const audioElement = document.getElementById("backgroundMusic");
-    if (audioElement.paused) {
-      setTimeout(() => {
-        audioElement.play().catch(error => {
-          console.error('Error playing audio:', error);
-        });
-      }, 100); // ajoute un délai de 100 ms avant de démarrer la musique
-    } else {
-      audioElement.pause();
-    }
     setMusicPlaying(!musicPlaying);
-  }
+    const audioElement = document.getElementById("backgroundMusic");
+    if (musicPlaying) {
+      audioElement.pause();
+    } else {
+      audioElement.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+    }
+  };
 
   return (
     <div className="App">
       <Title />
+      {isGameWon && (
+        <div className="victory-message">
+          <span role="img" aria-label="Trophy">
+            🏆
+          </span>{" "}
+          Vous avez gagné !
+        </div>
+      )}
       <div className="card-container">
         {cards.map((card, index) => (
           <Card
@@ -112,7 +138,7 @@ function App() {
       <Button onClick={toggleMusic}>
         {musicPlaying ? "Pause Music" : "Play Music"}
       </Button>
-      <audio ref={audioRef} id="backgroundMusic" loop>
+      <audio id="backgroundMusic" loop>
         <source src="./assets/musique/Red.m4a" type="audio/mpeg" />
         Votre navigateur ne prend pas en charge l'élément audio.
       </audio>
