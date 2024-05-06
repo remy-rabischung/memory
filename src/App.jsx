@@ -3,6 +3,8 @@ import Card from "./Card";
 import Button from "./Button";
 import Title from "./Title";
 import "./App.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Modal } from 'react-bootstrap';
 
 import coliseeImage from "./assets/images/colisee.png";
 import machuImage from "./assets/images/machu.png";
@@ -29,30 +31,38 @@ const initialCards = images
     id: index,
   }));
 
-  function App() {
-    const [cards, setCards] = useState([]);
-    const [flippedIndexes, setFlippedIndexes] = useState([]);
-    const [musicPlaying, setMusicPlaying] = useState(false);
-    const [isGameWon, setIsGameWon] = useState(false);
-  
-    useEffect(() => {
-      shuffleCards(initialCards);
-    }, []);
-  
-    useEffect(() => {
+function App() {
+  const [cards, setCards] = useState([]);
+  const [flippedIndexes, setFlippedIndexes] = useState([]);
+  const [isGameWon, setIsGameWon] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    shuffleCards(initialCards);
+  }, []);
+
+  useEffect(() => {
+    if (cards.length > 0) {
       const allCardsMatched = cards.every((card) => card.isMatched);
       if (allCardsMatched) {
         setIsGameWon(true);
       }
-    }, [cards]);
-  
-    useEffect(() => {
-      return () => {
-        setCards([]);
-        setFlippedIndexes([]);
-        setIsGameWon(false);
-      };
-    }, []);
+    }
+  }, [cards]);
+
+  useEffect(() => {
+    if (isGameWon) {
+      setShowModal(true);
+    }
+  }, [isGameWon]);
+
+  useEffect(() => {
+    return () => {
+      setCards([]);
+      setFlippedIndexes([]);
+      setIsGameWon(false);
+    };
+  }, []);
 
   useEffect(() => {
     if (flippedIndexes.length === 2) {
@@ -101,29 +111,14 @@ const initialCards = images
     setIsGameWon(false);
   };
 
-  const toggleMusic = () => {
-    setMusicPlaying(!musicPlaying);
-    const audioElement = document.getElementById("backgroundMusic");
-    if (musicPlaying) {
-      audioElement.pause();
-    } else {
-      audioElement.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      });
-    }
+  const handleCloseModal = () => {
+    setShowModal(false);
+    restartGame();
   };
-
+  
   return (
     <div className="App">
       <Title />
-      {isGameWon && (
-        <div className="victory-message">
-          <span role="img" aria-label="Trophy">
-            🏆
-          </span>{" "}
-          Vous avez gagné !
-        </div>
-      )}
       <div className="card-container">
         {cards.map((card, index) => (
           <Card
@@ -134,14 +129,21 @@ const initialCards = images
           />
         ))}
       </div>
-      <Button onClick={restartGame}>Restart Game</Button>
-      <Button onClick={toggleMusic}>
-        {musicPlaying ? "Pause Music" : "Play Music"}
-      </Button>
-      <audio id="backgroundMusic" loop>
-        <source src="./assets/musique/Red.m4a" type="audio/mpeg" />
-        Votre navigateur ne prend pas en charge l'élément audio.
-      </audio>
+      <Button onClick={restartGame} variant="primary" size="lg">Restart Game</Button>
+      <Modal show={showModal} onHide={handleCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <span role="img" aria-label="Trophy">
+              🏆
+            </span>{' '}
+            Félicitations !
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Vous avez gagné !</Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleCloseModal}>Rejouer</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

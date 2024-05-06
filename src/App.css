@@ -2,6 +2,9 @@
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   background-color: bisque;
+  background-image: url(../src/assets/background/fond-page1.png);
+  background-size: cover
+  
 }
 
 .card-container {
@@ -65,25 +68,6 @@
   transform: scale(1.1);
 }
 
-.victory-message {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  z-index: 289;
-}
-
-.victory-message span {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
-
 .fireworks-container {
   position: fixed;
   top: 0;
@@ -94,5 +78,5 @@
   z-index: 289;
 }
 .title {
-  width: 100%;
+  width: 30%;
 }
